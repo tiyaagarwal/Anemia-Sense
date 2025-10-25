@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>About Anemia Detection System</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+             background-image: url("{{ url_for('static', filename='Images/a.png') }}");
+             background-size: cover;
+             font-size: 1.5rem;
+        }
+        h2 {
+            color: #120e10;
+        }
+        pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+         .nav {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 1rem;
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .nav a button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .nav a button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: black;
+      border-radius: 5px;
+    }
+    </style>
+</head>
+<body>
+    <div class="nav">
+    <a href="{{ url_for('home') }}"><button>Home</button></a>
+    <a href="{{ url_for('about') }}"><button>About</button></a>
+    <a href="{{ url_for('predict') }}"><button>Predict</button></a>
+    <a href="{{ url_for('contact') }}"><button>Contact</button></a>
+</div>
+<div style="color: white;">
+    <h1 style="color: #cb6825;">Anemia Overview and Role of the Detection System</h1>
+    <pre>
+<strong>What is Anemia:</strong> Anemia is a medical condition characterized by a deficiency in the number or quality of red blood cells (RBCs) or hemoglobin in the blood. This results in a reduced ability of the blood to carry oxygen to the body’s tissues, often causing symptoms such as fatigue, weakness, pale or yellowish skin, dizziness, shortness of breath, and irregular heartbeat.
+
+<strong>Types of Anemia:</strong> There are multiple types of anemia:
+
+- <em>Iron-Deficiency Anemia</em>: The most common form, caused by insufficient iron levels, often due to blood loss or poor diet.
+- <em>Vitamin-Deficiency Anemia</em>: Caused by low levels of essential vitamins such as B12 and folate.
+- <em>Aplastic Anemia</em>: A rare condition where the body fails to produce enough blood cells.
+- <em>Hemolytic Anemia</em>: Characterized by the premature destruction of RBCs.
+- <em>Sickle Cell Anemia</em>: A genetic disorder where red blood cells are abnormally shaped, affecting their function and lifespan.
+
+<strong>Diagnosis:</strong> Anemia is diagnosed through a Complete Blood Count (CBC) test, which assesses various blood parameters including hemoglobin level, hematocrit (the percentage of blood volume occupied by RBCs), and RBC indices like MCV (Mean Corpuscular Volume) and MCH (Mean Corpuscular Hemoglobin). Based on these results, doctors may request further tests such as iron studies, vitamin levels, or a bone marrow biopsy.
+
+<strong>Treatment:</strong> The treatment plan depends on the type and cause of anemia:
+
+- <em>Iron-Deficiency</em>: Iron supplements and dietary changes.
+- <em>Vitamin-Deficiency</em>: Supplementation with B12 or folate.
+- <em>Severe Cases</em>: Blood transfusions may be needed.
+- <em>Chronic or Genetic Anemias</em>: Managed with medications, lifestyle changes, and regular monitoring.
+
+<strong>How This Tool Helps:</strong> This project uses a machine learning model trained on anemia-related patient data to automatically predict whether a patient is anemic based on input parameters such as hemoglobin, MCV, MCH, etc. Once the model is trained and the best algorithm is selected, the web interface allows users to input patient data and receive a real-time prediction. This system facilitates preliminary screening and helps reduce reliance on full diagnostic lab work, especially when resources are limited.
+
+<strong>Usefulness:</strong> The tool is particularly beneficial in resource-poor areas, remote clinics, and field health camps where access to advanced diagnostic facilities is limited. It enables early detection, prompts further medical evaluation, and aids in health awareness programs.
+
+<strong>Future Scope:</strong> Enhancements could include adding a severity scale, multilingual interface, offline/mobile versions, cloud integration for medical record storage, integration with wearable health data, and AI-based health recommendations to provide a more holistic solution.
+    </pre>
+    </div>
+</body>
+</html>

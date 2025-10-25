@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Home - Anemia Detection</title>
+  <style>
+    body {
+        background-image: url("{{ url_for('static', filename='Images/a.png') }}");
+        background-size: cover;
+        
+    }
+
+     .nav {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 1rem;
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .nav a button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .nav a button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: black;
+      border-radius: 5px;
+    }
+
+</style>
+
+</head>
+<body>
+ <div class="nav">
+    <a href="{{ url_for('home') }}"><button>Home</button></a>
+    <a href="{{ url_for('about') }}"><button>About</button></a>
+    <a href="{{ url_for('predict') }}"><button>Predict</button></a>
+    <a href="{{ url_for('contact') }}"><button>Contact</button></a>
+</div>
+
+  <div style="font-size: 5rem; color:#ffffff; margin-top: 10rem; margin-left: 7rem;">Welcome to Anemia Detection System<div>
+</body>
+</html>

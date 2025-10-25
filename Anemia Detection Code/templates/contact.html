@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Us - Anemia Detection System</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+        background-image: url("{{ url_for('static', filename='Images/a.png') }}");
+        background-size: cover;
+
+    }
+
+     .nav {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 1rem;
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .nav a button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .nav a button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: black;
+      border-radius: 5px;
+    }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            
+        }
+        .container {
+            background-color: #0d0c0c45;
+            max-width: 600px;
+            margin: auto;
+            margin-top: 70px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #cb6825;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 20px;
+            color: #ffffff;
+            margin: 10px 0;
+        }
+        .info {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        .info strong {
+            display: inline-block;
+            width: 120px;
+            text-align: right;
+            margin-right: 10px;
+            color: #cb6825;
+        }
+        .social-icons {
+            margin-top: 25px;
+        }
+        .social-icons a {
+            color: #cb6825;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 3rem;
+            transition: color 0.3s ease;
+        }
+        .social-icons a:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+    <a href="{{ url_for('home') }}"><button>Home</button></a>
+    <a href="{{ url_for('about') }}"><button>About</button></a>
+    <a href="{{ url_for('predict') }}"><button>Predict</button></a>
+    <a href="{{ url_for('contact') }}"><button>Contact</button></a>
+</div>
+
+    <div class="container">
+        <h1>Contact Us</h1>
+        <p>If you have any questions, feedback, or need assistance, feel free to reach out.</p>
+
+        <div class="info">
+            <p><strong>Organization:</strong> HealthCure.Ltd.</p>
+            <p><strong>Email:</strong> healthcure@meditechanalytics.com</p>
+            <p><strong>Phone 1:</strong> +91 98765 43210</p>
+            <p><strong>Phone 2:</strong> +91 91234 56789</p>
+            <p><strong>Telephone:</strong> 022-1234-5678</p>
+            <p><strong>Address:</strong> 3rd Floor, Health Hub Building,<br>
+                Hinjewadi Phase II, Pune, Maharashtra - 411057</p>
+        </div>
+
+        <div class="social-icons">
+            <a href="https://facebook.com" target="_blank" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+            <a href="https://twitter.com" target="_blank" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+            <a href="https://instagram.com" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+    </div>
+</body>
+</html>

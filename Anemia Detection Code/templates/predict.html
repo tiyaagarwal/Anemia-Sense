@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Predict Anemia</title>
+ 
+</head>
+<style>
+    body {
+        background-image: url("{{ url_for('static', filename='Images/a.png') }}");
+        background-size: cover;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 1rem;
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .nav a button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .nav a button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: black;
+      border-radius: 5px;
+    }
+
+    .box{
+        justify-content: center;
+        justify-items: center;
+        align-items: center;
+    }
+
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.85);
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      font-family: Arial, sans-serif;
+    }
+
+    .form-container h2 {
+      text-align: center;
+      color: #4B0000;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+    }
+
+    input[type="submit"] {
+      background-color: #4B0000;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #600000;
+    }
+</style>
+<body>
+  <div class="nav">
+    <a href="{{ url_for('home') }}"><button>Home</button></a>
+    <a href="{{ url_for('about') }}"><button>About</button></a>
+    <a href="{{ url_for('predict') }}"><button>Predict</button></a>
+    <a href="{{ url_for('contact') }}"><button>Contact</button></a>
+  </div>
+
+  <div class="box">
+    <div class="form-container">
+      <h2>Enter Patient's Details</h2>
+      <form action="/result" method="post">
+        <div class="form-group">
+          <label>Name:</label>
+          <input type="text" name="name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Address:</label>
+          <input type="text" name="address" required>
+        </div>
+
+        <div class="form-group">
+          <label>Phone:</label>
+          <input type="text" name="phone" required>
+        </div>
+
+        {% for field in fields %}
+          <div class="form-group">
+            {% if field.lower() == 'gender' %}
+              <label>Gender (0 = Female, 1 = Male):</label>
+            {% elif field.lower() == 'mch' %}
+              <label>MCH (Mean Corpuscular Hemoglobin):</label>
+            {% elif field.lower() == 'mchc' %}
+              <label>MCHC (Mean Corpuscular Hemoglobin Concentration):</label>
+            {% elif field.lower() == 'mcv' %}
+              <label>MCV (Mean Corpuscular Volume):</label>
+            {% else %}
+              <label>{{ field }}:</label>
+            {% endif %}
+            <input type="text" name="{{ field }}" required>
+          </div>
+        {% endfor %}
+
+        <input type="submit" value="Predict">
+      </form>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prediction Result</title>
+  <style>
+    body {
+      background-image: url("{{ url_for('static', filename='Images/a.png') }}");
+      background-size: cover;
+      background-position: center;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 1rem;
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .nav a button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .nav a button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: black;
+      border-radius: 5px;
+    }
+
+    .content {
+      text-align: center;
+      margin-top: 10%;
+      padding: 2rem;
+      background-color: rgba(0, 0, 0, 0.4);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .content h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .content h3 {
+      font-size: 1.5rem;
+    }
+
+    strong {
+      color: #FFD700;
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="nav">
+    <a href="{{ url_for('home') }}"><button>Home</button></a>
+    <a href="{{ url_for('about') }}"><button>About</button></a>
+    <a href="{{ url_for('predict') }}"><button>Predict</button></a>
+    <a href="{{ url_for('contact') }}"><button>Contact</button></a>
+  </div>
+
+  <div class="content">
+    <h2>{{ name }}, based on your inputs,</h2>
+    <h2>You are : <strong>{{ result }}</strong></h2>
+  </div>
+
+</body>
+</html>
