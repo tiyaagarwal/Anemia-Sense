@@ -35,8 +35,15 @@ def compute_metrics(y_true, y_pred, y_proba=None, labels=None) -> dict:
 
     if y_proba is not None:
         try:
+            # roc_auc_score's multi_class="ovr" path requires a 1D score array
+            # (probability of the positive class) for exactly 2 classes —
+            # passing the full (n_samples, 2) matrix raises. This project's
+            # real target has 9 classes, but keep this correct generally
+            # since compute_metrics is meant to be reusable.
+            score = y_proba[:, 1] if len(labels) == 2 else y_proba
+            multi_class_kwargs = {} if len(labels) == 2 else {"multi_class": "ovr"}
             metrics["roc_auc_ovr_macro"] = roc_auc_score(
-                y_true, y_proba, labels=labels, multi_class="ovr", average="macro"
+                y_true, score, labels=labels, average="macro", **multi_class_kwargs
             )
         except ValueError as e:
             # Can fail if a class is absent from a small fold/holdout split.
