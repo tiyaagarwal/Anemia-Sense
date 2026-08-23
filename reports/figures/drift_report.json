@@ -1,0 +1,81 @@
+{
+  "reference_n": 959,
+  "current_n": 240,
+  "test": "two-sample Kolmogorov-Smirnov, per feature",
+  "p_value_threshold": 0.05,
+  "features_with_drift": 0,
+  "total_features": 14,
+  "per_feature": {
+    "WBC": {
+      "ks_statistic": 0.07989224887035101,
+      "p_value": 0.16053783066053298,
+      "drift_detected": false
+    },
+    "LYMp": {
+      "ks_statistic": 0.0533411539798401,
+      "p_value": 0.6242030017080731,
+      "drift_detected": false
+    },
+    "NEUTp": {
+      "ks_statistic": 0.034693256864789745,
+      "p_value": 0.9676124510436793,
+      "drift_detected": false
+    },
+    "LYMn": {
+      "ks_statistic": 0.023162148070907218,
+      "p_value": 0.9998806403653924,
+      "drift_detected": false
+    },
+    "NEUTn": {
+      "ks_statistic": 0.036535453597497436,
+      "p_value": 0.9502262421676665,
+      "drift_detected": false
+    },
+    "RBC": {
+      "ks_statistic": 0.0456378171706639,
+      "p_value": 0.7965957704485089,
+      "drift_detected": false
+    },
+    "HGB": {
+      "ks_statistic": 0.0412452207160236,
+      "p_value": 0.8829114189184312,
+      "drift_detected": false
+    },
+    "HCT": {
+      "ks_statistic": 0.032677267987486935,
+      "p_value": 0.9815627800716763,
+      "drift_detected": false
+    },
+    "MCV": {
+      "ks_statistic": 0.044356100104275265,
+      "p_value": 0.8242927921560219,
+      "drift_detected": false
+    },
+    "MCH": {
+      "ks_statistic": 0.03619655891553697,
+      "p_value": 0.9530365479462986,
+      "drift_detected": false
+    },
+    "MCHC": {
+      "ks_statistic": 0.03275547445255478,
+      "p_value": 0.981065766697967,
+      "drift_detected": false
+    },
+    "PLT": {
+      "ks_statistic": 0.05512686826555435,
+      "p_value": 0.5787077172439135,
+      "drift_detected": false
+    },
+    "PDW": {
+      "ks_statistic": 0.06385123392422654,
+      "p_value": 0.396463725508583,
+      "drift_detected": false
+    },
+    "PCT": {
+      "ks_statistic": 0.04098453249913109,
+      "p_value": 0.8880686747682612,
+      "drift_detected": false
+    }
+  },
+  "mode": "sanity check: training split (reference) vs. held-out test split (current)"
+}

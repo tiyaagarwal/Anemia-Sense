@@ -75,6 +75,17 @@
 </div>
 
 <div class="section">
+  <h2>Data drift monitoring (offline demonstration)</h2>
+  <p><code>scripts/drift_report.py</code> runs a per-feature two-sample Kolmogorov-Smirnov test comparing two real
+  feature distributions — there's no live production traffic to monitor here, so this is a demonstration of the
+  mechanism, not a live dashboard. By default it compares the training split against the held-out test split
+  (expected result: no drift, since both are stratified samples of the same data — a sanity check on the test
+  itself). Run <code>python -m scripts.drift_report --classes "Healthy" "Iron deficiency anemia"</code> to see it
+  correctly flag real drift between two genuinely different patient populations (HGB and MCH show the strongest
+  shift, consistent with how iron deficiency anemia is clinically distinguished).</p>
+</div>
+
+<div class="section">
   <h2>Limitations</h2>
   <ul>
     <li><strong>Small dataset for two classes.</strong> Macrocytic anemia (16 rows) and Leukemia with thrombocytopenia (10 rows) have very few examples — their per-class metrics carry wide uncertainty.</li>
