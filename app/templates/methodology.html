@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Data &amp; Methodology — Anemia-Sense{% endblock %}
+{% block content %}
+<h1>Data &amp; methodology</h1>
+
+<div class="section">
+  <h2>Why this page exists</h2>
+  <div class="finding-box">
+    <p><strong>An earlier version of this project used only Gender and Hemoglobin and reported ~100% accuracy on 5+ models.</strong>
+    That wasn't a modeling achievement — Hemoglobin turned out to be a deterministic threshold function of the label
+    with zero overlap, and 62% of the source rows were exact duplicates contaminating the train/test split.
+    Full history: <a href="https://github.com/tiyaagarwal/Anemia-Sense/blob/main/analysis/FINDINGS.md">analysis/FINDINGS.md</a>.
+    Rather than presenting inflated metrics, this project was redesigned around a richer CBC feature space
+    and a leakage-aware evaluation methodology — documented below.</p>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Dataset</h2>
+  <p><strong>Source:</strong> <a href="https://www.kaggle.com/datasets/ehababoelnaga/anemia-types-classification">Anemia Types Classification</a> (Kaggle, Apache 2.0) — real CBC data, manually diagnosed.</p>
+  {% if data_quality %}
+  <div class="grid grid-3">
+    <div class="card"><h3>Raw rows</h3><div class="stat">{{ data_quality.raw_rows }}</div></div>
+    <div class="card"><h3>Duplicates removed</h3><div class="stat">{{ data_quality.duplicate_rows_removed }}</div></div>
+    <div class="card"><h3>Implausible rows removed</h3><div class="stat">{{ data_quality.physiologically_implausible_rows_removed }}</div></div>
+  </div>
+  <p>Final clean dataset: <strong>{{ data_quality.rows_after_cleaning }} rows</strong>, {{ data_quality.class_distribution|length }} classes.
+  Smallest class: <strong>{{ data_quality.smallest_class }}</strong> ({{ data_quality.smallest_class_count }} rows) — read its metrics with wide uncertainty in mind.</p>
+
+  <h3 style="margin-top:2rem;">Class distribution</h3>
+  {% for label, count in data_quality.class_distribution.items() %}
+  <div class="bar-row">
+    <div class="bar-label">{{ label }}</div>
+    <div class="bar-track"><div class="bar-fill" style="width: {{ (count / data_quality.class_distribution.values()|max * 100)|round(1) }}%;"></div></div>
+    <div class="bar-value">{{ count }}</div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+
+<div class="section">
+  <h2>Leakage check</h2>
+  {% if data_quality %}
+  <p>{{ data_quality.leakage_finding }}</p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Feature</th><th>Single-feature accuracy (depth-3 stump)</th></tr></thead>
+      <tbody>
+        {% for feature, acc in data_quality.single_feature_leakage_check_depth3_stump_accuracy.items()|sort(attribute='1', reverse=true) %}
+        <tr><td>{{ feature }}</td><td>{{ "%.1f"|format(acc * 100) }}%</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="field-hint">Compare to the full 14-feature model's ~98% accuracy (see <a href="{{ url_for('main.performance') }}">Model Performance</a>) — no single feature comes close, meaning the signal genuinely requires the whole panel.</p>
+  {% endif %}
+</div>
+
+<div class="section">
+  <h2>Feature engineering</h2>
+  <p>All 14 CBC features are numeric with no missing values after cleaning. Preprocessing is a single
+  <code>ColumnTransformer</code> step (median imputation + standard scaling), fit only on the training split
+  inside a scikit-learn <code>Pipeline</code> — never on validation or test data, and never outside the pipeline
+  where it could leak information across the split.</p>
+</div>
+
+<div class="section">
+  <h2>Evaluation strategy</h2>
+  <ul>
+    <li>A stratified 80/20 holdout is carved out <em>before</em> any model selection or tuning happens, and is never touched until the single final evaluation.</li>
+    <li>Model selection uses 5-fold stratified cross-validation on the remaining 80%, scored on <strong>macro-F1</strong> (not accuracy) because the classes are imbalanced.</li>
+    <li>The CV winner is tuned with <code>RandomizedSearchCV</code>, still restricted to the training split.</li>
+    <li>The held-out test set is evaluated exactly once, with the tuned pipeline, to produce the numbers on the <a href="{{ url_for('main.performance') }}">Model Performance</a> page.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>Limitations</h2>
+  <ul>
+    <li><strong>Small dataset for two classes.</strong> Macrocytic anemia (16 rows) and Leukemia with thrombocytopenia (10 rows) have very few examples — their per-class metrics carry wide uncertainty.</li>
+    <li><strong>Manually diagnosed, single-source data.</strong> The dataset description states diagnoses were made manually from CBC values; this hasn't been validated against a second, independent clinical dataset.</li>
+    <li><strong>Not a diagnostic tool.</strong> This reproduces patterns in a labeled dataset; it does not replace a clinician's diagnosis and has not been through any clinical validation process.</li>
+    <li><strong>Physiologically-implausible-row filtering uses fixed reference ranges</strong> (see <code>src/data/validate_data.py</code>) — generous enough to keep genuine extreme pathology, but a judgment call, not a formally validated clinical threshold set.</li>
+  </ul>
+</div>
+{% endblock %}

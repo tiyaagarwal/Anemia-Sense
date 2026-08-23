@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Anemia-Sense — CBC-based anemia classification{% endblock %}
+{% block content %}
+<div class="hero">
+  <span class="badge">Currently serving: {{ metadata.model_name }}</span>
+  <h1>Leakage-aware CBC analytics &amp; anemia classification</h1>
+  <p class="lead">
+    A machine learning system that classifies anemia-related conditions from a full Complete Blood Count (CBC)
+    panel — not a single lab value. Built after diagnosing and fixing a data-leakage bug in an earlier version
+    that made the problem trivially easy for a model to "solve."
+  </p>
+  <a class="btn" href="{{ url_for('main.predict_form') }}">Try a prediction &rarr;</a>
+</div>
+
+<div class="section">
+  <h2>How the pipeline works</h2>
+  <div class="grid grid-3">
+    <div class="card">
+      <h3>1. Data quality</h3>
+      <p>Every training run deduplicates the dataset and rejects physiologically impossible values (e.g. negative hemoglobin) before anything touches a model. See the full report on the <a href="{{ url_for('main.methodology') }}">Data &amp; Methodology</a> page.</p>
+    </div>
+    <div class="card">
+      <h3>2. Benchmarking</h3>
+      <p>Five classifiers are compared via stratified 5-fold cross-validation, scored on macro-F1 (not raw accuracy) because the classes are imbalanced. The winner is tuned with RandomizedSearchCV, still without ever touching the held-out test set.</p>
+    </div>
+    <div class="card">
+      <h3>3. Explainability</h3>
+      <p>Every prediction ships with the specific CBC values that drove it (SHAP), plus a model-wide feature importance ranking (permutation importance) computed on the held-out set — not the training set.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Key capabilities</h2>
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Multi-class CBC classification</h3>
+      <p>Predicts across 9 real diagnostic categories present in the source data (Healthy, Iron deficiency anemia, Macrocytic anemia, Leukemia, Thrombocytopenia, and more) — not a coin-flip binary label.</p>
+    </div>
+    <div class="card">
+      <h3>Model transparency</h3>
+      <p>The <a href="{{ url_for('main.performance') }}">Model Performance</a> page renders the actual cross-validation and held-out test metrics from <code>reports/metrics/latest_metrics.json</code> — nothing on that page is hardcoded.</p>
+    </div>
+    <div class="card">
+      <h3>REST API</h3>
+      <p><code>POST /api/v1/predict</code> accepts the same 14 CBC values as JSON and returns a prediction, confidence, and top contributing features — for programmatic use, not just the web form.</p>
+    </div>
+    <div class="card">
+      <h3>Honest about its limits</h3>
+      <p>The <a href="{{ url_for('main.methodology') }}">Data &amp; Methodology</a> page documents exactly why an earlier version of this project reported ~100% accuracy, and why that was a red flag rather than a result.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

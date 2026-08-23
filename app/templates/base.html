@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Anemia-Sense{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-brand">Anemia<span>Sense</span></div>
+    <div class="nav-links">
+      <a href="{{ url_for('main.landing') }}" class="{{ 'active' if request.endpoint == 'main.landing' }}">Home</a>
+      <a href="{{ url_for('main.predict_form') }}" class="{{ 'active' if request.endpoint in ('main.predict_form','main.predict_submit') }}">Predict</a>
+      <a href="{{ url_for('main.performance') }}" class="{{ 'active' if request.endpoint == 'main.performance' }}">Model Performance</a>
+      <a href="{{ url_for('main.methodology') }}" class="{{ 'active' if request.endpoint == 'main.methodology' }}">Data &amp; Methodology</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    {% block content %}{% endblock %}
+
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> This application is an educational machine learning project and is not a medical diagnostic tool or a substitute for professional healthcare advice.
+    </div>
+  </div>
+
+  <footer>
+    Anemia-Sense — leakage-aware CBC analytics, built as a portfolio ML project. <a href="https://github.com/tiyaagarwal/Anemia-Sense">Source on GitHub</a>.
+  </footer>
+</body>
+</html>

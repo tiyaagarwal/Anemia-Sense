@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Predict — Anemia-Sense{% endblock %}
+{% block content %}
+<h1>Enter CBC parameters</h1>
+<p class="lead" style="color: var(--text-dim);">All 14 fields are required — these are exactly the features the model was trained on. Values are validated both here and on the server against plausible physiological ranges.</p>
+
+<form action="{{ url_for('main.predict_submit') }}" method="post">
+
+  {% set groups = [
+    ('Red Blood Cell Indices', [
+      ('RBC', 'x10⁶/µL'), ('HGB', 'g/dL'), ('HCT', '%'),
+      ('MCV', 'fL'), ('MCH', 'pg'), ('MCHC', 'g/dL')
+    ]),
+    ('White Blood Cells', [
+      ('WBC', 'x10³/µL'), ('LYMp', '%'), ('NEUTp', '%'),
+      ('LYMn', 'x10³/µL'), ('NEUTn', 'x10³/µL')
+    ]),
+    ('Platelets', [
+      ('PLT', 'x10³/µL'), ('PDW', 'fL'), ('PCT', '%')
+    ]),
+  ] %}
+
+  {% for group_name, fields in groups %}
+  <fieldset>
+    <legend>{{ group_name }}</legend>
+    <div class="field-grid">
+      {% for field, unit in fields %}
+      <div class="field">
+        <label for="{{ field }}">{{ field }} <span class="unit">({{ unit }})</span></label>
+        <input type="number" step="any" id="{{ field }}" name="{{ field }}"
+               min="{{ ranges[field][0] }}" max="{{ ranges[field][1] }}" required>
+        <span class="field-hint">plausible range: {{ ranges[field][0] }}–{{ ranges[field][1] }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </fieldset>
+  {% endfor %}
+
+  <button type="submit">Predict</button>
+</form>
+{% endblock %}

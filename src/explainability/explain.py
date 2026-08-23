@@ -36,7 +36,10 @@ def compute_global_importance(pipeline, X_test, y_test, n_repeats: int = 20) -> 
     return dict(sorted(importances.items(), key=lambda kv: kv[1]["mean"], reverse=True))
 
 
-def _make_shap_explainer(pipeline, background: pd.DataFrame):
+def make_shap_explainer(pipeline, background: pd.DataFrame):
+    """Builds a SHAP explainer once (this is the expensive step — callers
+    should build it a single time at app startup and reuse it, not rebuild
+    it per request/prediction)."""
     model = pipeline.named_steps["model"]
     preprocessor = pipeline.named_steps["preprocess"]
     background_transformed = preprocessor.transform(background)
@@ -46,13 +49,13 @@ def _make_shap_explainer(pipeline, background: pd.DataFrame):
     return shap.Explainer(model.predict_proba, background_transformed, feature_names=FEATURE_COLUMNS)
 
 
-def explain_prediction(pipeline, input_row: pd.DataFrame, background: pd.DataFrame, top_n: int = 5) -> list:
+def explain_prediction(pipeline, input_row: pd.DataFrame, explainer, top_n: int = 5) -> list:
     """Returns the top_n features driving the prediction for a single input
-    row, for the class the model actually predicted."""
+    row, for the class the model actually predicted. `explainer` should come
+    from make_shap_explainer(), built once and reused across calls."""
     predicted_class = pipeline.predict(input_row)[0]
     class_idx = list(pipeline.classes_).index(predicted_class)
 
-    explainer = _make_shap_explainer(pipeline, background)
     transformed_row = pipeline.named_steps["preprocess"].transform(input_row)
     shap_values = explainer(transformed_row)
 
@@ -92,7 +95,9 @@ def main() -> None:
 
     # Sanity-check the local explanation path with one real test-set row.
     example = X_test.iloc[[0]]
-    local = explain_prediction(pipeline, example, background=X.sample(min(50, len(X)), random_state=RANDOM_STATE))
+    background = X.sample(min(50, len(X)), random_state=RANDOM_STATE)
+    explainer = make_shap_explainer(pipeline, background)
+    local = explain_prediction(pipeline, example, explainer)
     print(f"\nExample local explanation for one held-out row (predicted: {pipeline.predict(example)[0]}):")
     for item in local:
         print(f"  {item['feature']}={item['value']}: {item['direction']} likelihood (shap={item['shap_value']:+.4f})")
