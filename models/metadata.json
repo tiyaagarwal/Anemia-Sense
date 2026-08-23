@@ -1,0 +1,39 @@
+{
+  "model_name": "Gradient Boosting",
+  "trained_at": "2026-08-23T15:00:52.201292+00:00",
+  "feature_columns": [
+    "WBC",
+    "LYMp",
+    "NEUTp",
+    "LYMn",
+    "NEUTn",
+    "RBC",
+    "HGB",
+    "HCT",
+    "MCV",
+    "MCH",
+    "MCHC",
+    "PLT",
+    "PDW",
+    "PCT"
+  ],
+  "target_column": "Diagnosis",
+  "class_labels": [
+    "Healthy",
+    "Iron deficiency anemia",
+    "Leukemia",
+    "Leukemia with thrombocytopenia",
+    "Macrocytic anemia",
+    "Normocytic hypochromic anemia",
+    "Normocytic normochromic anemia",
+    "Other microcytic anemia",
+    "Thrombocytopenia"
+  ],
+  "hyperparameters": {
+    "model__learning_rate": 0.07200939605233163,
+    "model__max_depth": 2,
+    "model__n_estimators": 213
+  },
+  "n_train_rows": 959,
+  "n_test_rows": 240
+}

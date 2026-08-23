@@ -1,0 +1,216 @@
+{
+  "selected_model": "Gradient Boosting",
+  "cross_validation_benchmark": {
+    "Logistic Regression": {
+      "macro_f1_mean": 0.7548866890786654,
+      "macro_f1_std": 0.05127505043279985,
+      "accuracy_mean": 0.8727476003490402,
+      "accuracy_std": 0.01967667834756733
+    },
+    "Random Forest": {
+      "macro_f1_mean": 0.8720331552824023,
+      "macro_f1_std": 0.06547708691609302,
+      "accuracy_mean": 0.9728839441535776,
+      "accuracy_std": 0.005130169327341254
+    },
+    "Gradient Boosting": {
+      "macro_f1_mean": 0.9286054788830611,
+      "macro_f1_std": 0.04739422784749239,
+      "accuracy_mean": 0.9864419720767887,
+      "accuracy_std": 0.004174967517986527
+    },
+    "HistGradientBoosting": {
+      "macro_f1_mean": 0.9150495810677061,
+      "macro_f1_std": 0.037558590257626666,
+      "accuracy_mean": 0.9739365183246074,
+      "accuracy_std": 0.009304849244332164
+    },
+    "SVM": {
+      "macro_f1_mean": 0.7185082750639187,
+      "macro_f1_std": 0.051783017111887215,
+      "accuracy_mean": 0.843586387434555,
+      "accuracy_std": 0.012761954903264348
+    }
+  },
+  "selected_model_hyperparameters": {
+    "model__learning_rate": 0.07200939605233163,
+    "model__max_depth": 2,
+    "model__n_estimators": 213
+  },
+  "held_out_test": {
+    "accuracy": 0.9958333333333333,
+    "macro_f1": 0.9950234472198297,
+    "weighted_f1": 0.9957723227103071,
+    "macro_precision": 0.9982905982905983,
+    "macro_recall": 0.9920634920634921,
+    "per_class": {
+      "Healthy": {
+        "precision": 0.9846153846153847,
+        "recall": 1.0,
+        "f1": 0.9922480620155039,
+        "support": 64.0
+      },
+      "Iron deficiency anemia": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 36.0
+      },
+      "Leukemia": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 9.0
+      },
+      "Leukemia with thrombocytopenia": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 2.0
+      },
+      "Macrocytic anemia": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 3.0
+      },
+      "Normocytic hypochromic anemia": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 52.0
+      },
+      "Normocytic normochromic anemia": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 50.0
+      },
+      "Other microcytic anemia": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 10.0
+      },
+      "Thrombocytopenia": {
+        "precision": 1.0,
+        "recall": 0.9285714285714286,
+        "f1": 0.9629629629629629,
+        "support": 14.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        64,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        36,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        52,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        50,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        10,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        13
+      ]
+    ],
+    "confusion_matrix_labels": [
+      "Healthy",
+      "Iron deficiency anemia",
+      "Leukemia",
+      "Leukemia with thrombocytopenia",
+      "Macrocytic anemia",
+      "Normocytic hypochromic anemia",
+      "Normocytic normochromic anemia",
+      "Other microcytic anemia",
+      "Thrombocytopenia"
+    ],
+    "roc_auc_ovr_macro": 0.9999550184405687
+  }
+}
