@@ -1,0 +1,41 @@
+{
+  "source_file": "data/raw/anemia_types_cbc.csv",
+  "raw_rows": 1281,
+  "missing_values": {},
+  "duplicate_rows_removed": 49,
+  "rows_after_dedup": 1232,
+  "physiologically_implausible_rows_removed": 33,
+  "rows_after_cleaning": 1199,
+  "class_distribution": {
+    "Healthy": 319,
+    "Normocytic hypochromic anemia": 262,
+    "Normocytic normochromic anemia": 250,
+    "Iron deficiency anemia": 179,
+    "Thrombocytopenia": 69,
+    "Other microcytic anemia": 50,
+    "Leukemia": 44,
+    "Macrocytic anemia": 16,
+    "Leukemia with thrombocytopenia": 10
+  },
+  "smallest_class": "Leukemia with thrombocytopenia",
+  "smallest_class_count": 10,
+  "single_feature_leakage_check_depth3_stump_accuracy": {
+    "WBC": 0.4529,
+    "LYMp": 0.3461,
+    "NEUTp": 0.3444,
+    "LYMn": 0.3595,
+    "NEUTn": 0.3645,
+    "RBC": 0.4504,
+    "HGB": 0.6213,
+    "HCT": 0.422,
+    "MCV": 0.5796,
+    "MCH": 0.5897,
+    "MCHC": 0.5121,
+    "PLT": 0.4946,
+    "PDW": 0.2752,
+    "PCT": 0.3662
+  },
+  "max_single_feature_accuracy": 0.6213,
+  "leakage_finding": "No single feature reconstructs the label (max single-feature stump accuracy 62.1%) \u2014 see analysis/FINDINGS.md for the contrast with the original single-feature-deterministic dataset.",
+  "validation_status": "passed"
+}
