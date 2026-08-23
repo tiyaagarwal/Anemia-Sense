@@ -1,8 +1,8 @@
 [
   {
-    "timestamp": "2026-08-23T15:18:52.140266+00:00",
+    "timestamp": "2026-08-23T15:29:15.897836+00:00",
     "model_name": "Gradient Boosting",
-    "trained_at": "2026-08-23T15:18:52.140266+00:00",
+    "trained_at": "2026-08-23T15:29:15.897836+00:00",
     "feature_columns": [
       "WBC",
       "LYMp",
