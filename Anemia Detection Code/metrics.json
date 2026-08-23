@@ -1,0 +1,55 @@
+{
+  "selected_model": "Random Forest",
+  "fields": [
+    "Gender",
+    "Hemoglobin",
+    "MCH",
+    "MCHC",
+    "MCV"
+  ],
+  "n_rows_after_dedup": 534,
+  "cross_validation": {
+    "Logistic Regression": {
+      "mean": 0.9859917920656635,
+      "std": 0.017082146773140384
+    },
+    "Random Forest": {
+      "mean": 0.9976744186046511,
+      "std": 0.004651162790697683
+    },
+    "Decision Tree": {
+      "mean": 0.9976744186046511,
+      "std": 0.004651162790697683
+    },
+    "Naive Bayes": {
+      "mean": 0.934610123119015,
+      "std": 0.03553054987629115
+    },
+    "SVM": {
+      "mean": 0.9696580027359781,
+      "std": 0.02605110950462694
+    },
+    "Gradient Boosting": {
+      "mean": 0.9976744186046511,
+      "std": 0.004651162790697683
+    }
+  },
+  "held_out_test": {
+    "n_rows": 107,
+    "accuracy": 1.0,
+    "precision_macro": 1.0,
+    "recall_macro": 1.0,
+    "f1_macro": 1.0,
+    "roc_auc": 1.0,
+    "confusion_matrix": [
+      [
+        58,
+        0
+      ],
+      [
+        0,
+        49
+      ]
+    ]
+  }
+}
