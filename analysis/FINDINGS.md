@@ -1,5 +1,12 @@
 # Why every model reported ~100% accuracy
 
+> **This document is historical.** It analyzes the original Gender+Hemoglobin
+> dataset this project started with (preserved at `analysis/legacy_dataset/anemia.csv`).
+> This finding is *why* the project was redesigned around a richer, genuine
+> multi-class CBC dataset — see `reports/data_quality/DATASET_CARD.md` for
+> the current dataset's own (much smaller, still real) data-quality issues,
+> and the root [README](../README.md) for the current pipeline and results.
+
 Reproduce this analysis yourself: `python analysis/diagnose_data_issues.py`
 
 ## Root causes

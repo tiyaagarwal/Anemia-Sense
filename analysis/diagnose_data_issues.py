@@ -1,4 +1,11 @@
-"""Reproduces and documents the two root causes behind every model in this
+"""HISTORICAL — preserved as-is. This analyzes the original Gender+Hemoglobin
+dataset this project started with. The project has since moved to a richer,
+genuine multi-class CBC dataset (see reports/data_quality/DATASET_CARD.md
+and src/data/validate_data.py) — this script and its findings are kept here
+because they're the reason for that redesign, not because they describe the
+current pipeline.
+
+Reproduces and documents the two root causes behind every model in this
 project reporting ~100% accuracy in the original code:
 
 1. 887 of 1421 rows (62%) in data/anemia.csv are exact duplicates. A random
@@ -30,7 +37,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 
-DATA_PATH = "data/anemia.csv"
+DATA_PATH = "analysis/legacy_dataset/anemia.csv"
 
 
 def report_duplicates(df: pd.DataFrame) -> None:
