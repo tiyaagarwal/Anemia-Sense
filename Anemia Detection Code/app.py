@@ -64,7 +64,8 @@ def result():
         except ValueError:
             return render_template("error.html", message=f"{field} must be a number, got '{raw}'."), 400
 
-    values_scaled = scaler.transform([values])
+    input_df = pd.DataFrame([values], columns=fields)
+    values_scaled = scaler.transform(input_df)
     prediction = model.predict(values_scaled)[0]
     prediction_result = "Anemic" if prediction == 1 else "Not Anemic"
     return render_template("result.html", name=name, result=prediction_result)
