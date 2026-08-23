@@ -1,64 +1,99 @@
-# Anemia-Sense
+# Anemia-Sense: Leakage-Aware CBC Analytics & Machine Learning
 
 [![Tests](https://github.com/tiyaagarwal/Anemia-Sense/actions/workflows/tests.yml/badge.svg)](https://github.com/tiyaagarwal/Anemia-Sense/actions/workflows/tests.yml)
 
-A Flask web app that predicts anemia from CBC blood parameters (Gender, Hemoglobin, MCH, MCHC, MCV), comparing 6 classifiers (Logistic Regression, Random Forest, Decision Tree, Naive Bayes, SVM, Gradient Boosting) via cross-validation and shipping the best one.
+An end-to-end, production-style ML system that classifies anemia-related conditions from a full Complete Blood Count (CBC) panel — 9 real diagnostic classes, benchmarked models, SHAP explainability, a REST API, and honest, reproducible metrics. Built after diagnosing a data-leakage bug in an earlier version that made the whole problem trivial.
 
-## The interesting part: diagnosing why every model hit ~100% accuracy
+**Live in the app:** the Model Performance and Data & Methodology pages (`/performance`, `/methodology` — see [Application](#application) below) render everything in this README directly from the committed `reports/` artifacts — nothing on this page or in the app is hand-typed separately from what the pipeline actually produced.
 
-The original version of this project trained 7 models on a single random `train_test_split` and reported that all of them scored ~100% accuracy — the kind of number that should make you suspicious, not proud. Digging in found two real, independent bugs:
+## Why the original version was suspicious, not good
 
-1. **62% of the dataset (887 of 1421 rows) is exact duplicate rows.** A plain `train_test_split` puts copies of the same row on both sides, so part of the reported "test" accuracy was the model recognizing rows it was literally trained on.
-2. **`Result` is a deterministic threshold function of Hemoglobin + Gender, with zero label noise** — this synthetic Kaggle dataset encodes the WHO anemia cutoff directly (female: anemic iff Hemoglobin < 12.0; male: anemic iff Hemoglobin < 13.5, with *zero* overlap at either boundary). Given Hemoglobin, `Result` isn't a pattern to learn, it's a lookup table already present in the input.
+An earlier version of this project used only **Gender + Hemoglobin** as input, compared 7 classifiers, and reported ~100% accuracy on all of them. That's a red flag, not an achievement. Two real bugs were behind it:
 
-Full write-up with the reproducible diagnosis script and an ablation proving accuracy collapses to near-chance once Hemoglobin is withheld: **[`Anemia Detection Code/analysis/FINDINGS.md`](Anemia%20Detection%20Code/analysis/FINDINGS.md)**.
+1. **62% of the dataset was exact duplicate rows.** A plain `train_test_split` put copies of the same row on both sides, so part of the "test" accuracy was the model recognizing rows it had literally trained on.
+2. **The label was a deterministic threshold function of Hemoglobin + Gender**, with zero label noise — female: anemic iff Hemoglobin < 12.0; male: anemic iff Hemoglobin < 13.5, with *zero* overlap at either boundary. Given Hemoglobin, the label wasn't a pattern to learn, it was a lookup table already present in the input.
 
-### What was actually fixed
+Full history, with the original reproducible diagnosis script and its captured output: [`analysis/FINDINGS.md`](analysis/FINDINGS.md).
 
-- Deduplicated the dataset before any split — a real, necessary fix that removes train/test contamination.
-- Replaced the single-split accuracy number with **stratified 5-fold cross-validation** plus a genuine **held-out test set** that never touches model selection.
-- Model selection now picks by CV mean with a documented interpretability tie-break, instead of naive `argmax` over a single accuracy number (see `train.py`).
-- Extracted training out of the Flask app into a standalone, reproducible `train.py` — `app.py` now only serves pre-trained artifacts and fails loudly if they're missing, instead of silently retraining 7 models on cold start.
+**Rather than presenting inflated metrics, the project was redesigned around a richer CBC feature space and a leakage-aware evaluation methodology** — that redesign is documented end-to-end below.
 
-Deduplicating alone does **not** bring accuracy down to something more "realistic", because cause #2 above isn't a bug — Hemoglobin genuinely is the clinical basis for the WHO anemia definition this dataset's labels were generated from. A model with access to it is *expected* to score very high. The point of this fix isn't a lower accuracy number; it's a methodologically sound one, backed by evidence instead of an unexamined single train/test split.
+## Dataset
 
-## Model performance (current, reproducible via `python train.py`)
+**Source:** [Anemia Types Classification](https://www.kaggle.com/datasets/ehababoelnaga/anemia-types-classification) (Kaggle, Apache 2.0) — real CBC data, manually diagnosed. Full dataset card, audit, and license details: [`reports/data_quality/DATASET_CARD.md`](reports/data_quality/DATASET_CARD.md).
 
-Selected model: **Random Forest**, chosen by 5-fold cross-validation on the training split.
+- 1281 raw rows → 1232 after deduplication (49 exact duplicates, 3.8%) → **1199 after dropping physiologically implausible rows** (33 rows, 2.7% — e.g. MCV=990, HGB=-10; these read as data-entry corruption, not extreme pathology).
+- **14 real CBC features:** WBC, LYMp, NEUTp, LYMn, NEUTn, RBC, HGB, HCT, MCV, MCH, MCHC, PLT, PDW, PCT.
+- **9 genuine diagnostic classes** (present in the source data, not invented): Healthy, Iron deficiency anemia, Normocytic hypochromic anemia, Normocytic normochromic anemia, Other microcytic anemia, Macrocytic anemia, Thrombocytopenia, Leukemia, Leukemia with thrombocytopenia. Imbalanced — Healthy (319) down to Leukemia with thrombocytopenia (10).
+- **Leakage check, done before committing to this dataset:** a depth-3 decision-tree stump on any single feature tops out at **62.1% accuracy** (Hemoglobin). No feature reconstructs the label the way Hemoglobin alone did in the original dataset. Full audit and reasoning: [`reports/data_quality/DATASET_CARD.md`](reports/data_quality/DATASET_CARD.md).
 
-| Model | CV accuracy (5-fold) |
+## Model performance (reproducible via `python -m src.models.train`)
+
+**Selected model: Gradient Boosting** — picked by 5-fold cross-validation on macro-F1 (not raw accuracy, since classes are imbalanced 319:10), then tuned with `RandomizedSearchCV`.
+
+| Model | CV macro-F1 (5-fold) | CV accuracy |
+|---|---|---|
+| **Gradient Boosting** | **92.9% (±4.7%)** | 98.6% |
+| HistGradientBoosting | 91.5% (±3.8%) | 97.4% |
+| Random Forest | 87.2% (±6.5%) | 97.3% |
+| Logistic Regression | 75.5% (±5.1%) | 87.3% |
+| SVM | 71.9% (±5.2%) | 84.4% |
+
+**Held-out test set** (240 rows, stratified, never touched during model selection or tuning): accuracy 99.6%, macro-F1 99.5%, weighted-F1 99.6%, ROC-AUC (OVR, macro) 0.9999. Full per-class precision/recall/F1 and the confusion matrix: [`reports/metrics/latest_metrics.json`](reports/metrics/latest_metrics.json) (or the app's Model Performance page).
+
+These numbers are genuinely computed, not targeted — Logistic Regression and SVM visibly struggle relative to the boosted-tree models, which is exactly the kind of real differentiation you'd expect from a non-trivial multiclass problem. Two classes (Macrocytic anemia: 16 rows, Leukemia with thrombocytopenia: 10 rows) have very few examples; their per-class metrics carry wide uncertainty — see Limitations.
+
+## Explainability
+
+- **Global (model-wide):** permutation importance on the held-out test set, scored by macro-F1 drop when a feature is shuffled. HGB and MCV dominate (consistent with how anemia is clinically diagnosed from CBC indices); several features show ~zero importance for the selected model. [`reports/figures/global_feature_importance.json`](reports/figures/global_feature_importance.json).
+- **Local (per-prediction):** SHAP explains every individual prediction — the app's results page and the API response both show the top contributing features with direction, not just a bare label.
+
+## Data drift monitoring (offline demonstration)
+
+`scripts/drift_report.py` runs a per-feature Kolmogorov-Smirnov test between two real feature distributions. There's no live production traffic to monitor, so this is explicitly a demonstration of the mechanism: by default it compares the train/test split (expected result: no drift, since both are samples of the same data), and `--classes "Healthy" "Iron deficiency anemia"` demonstrates it correctly flagging real drift (HGB and MCH show the strongest shift — consistent with clinical practice).
+
+## Application
+
+A 5-page Flask app (`app/`) plus a REST API:
+
+| Page/Route | What it shows |
 |---|---|
-| Random Forest | 99.8% (±0.5%) |
-| Decision Tree | 99.8% (±0.5%) |
-| Gradient Boosting | 99.8% (±0.5%) |
-| Logistic Regression | 98.6% (±1.7%) |
-| SVM | 97.0% (±2.6%) |
-| Naive Bayes | 93.5% (±3.6%) |
+| `/` | Overview, how the pipeline works, key capabilities |
+| `/predict` | Grouped CBC input form (Red Cell Indices / White Cells / Platelets), server + browser-side validation against real physiological ranges — no PII fields |
+| `/predict` (POST) | Prediction, confidence, full class probabilities, SHAP top-contributing-features, input summary |
+| `/performance` | Model comparison table, held-out metrics, confusion matrix, global feature importance, experiment log — all loaded from `reports/`, nothing hardcoded |
+| `/methodology` | Dataset card, leakage check, evaluation strategy, drift monitoring, limitations |
+| `POST /api/v1/predict` | Same prediction, as JSON, with structured validation errors |
+| `GET /health`, `GET /api/v1/health` | Liveness checks |
 
-Held-out test set (107 rows, never used in model selection): **100% accuracy, ROC-AUC 1.0000**, confusion matrix `[[58, 0], [0, 49]]`. Full numbers (precision/recall/F1 per class) are written to `Anemia Detection Code/metrics.json` by `train.py`.
-
-## Limitations (read before treating this as more than a portfolio demo)
-
-- **The dataset is small and synthetic.** After deduplication there are only 534 unique rows, and the labels have no measurement noise — real clinical hemoglobin/CBC readings do. This model has not been validated against a real, noisy clinical dataset and shouldn't be treated as one.
-- **This is not a diagnostic tool.** It reproduces a known clinical threshold rule from CBC inputs; it does not add independent diagnostic signal beyond what the WHO Hemoglobin cutoff already tells you.
-- **`npm`-style dependency pinning, not a training-data audit.** `requirements.txt` pins the exact versions this was verified against; it does not certify the source dataset's provenance beyond what's in `data/anemia.csv`.
+No name/address/phone collected anywhere — only the 14 CBC values the model was actually trained on.
 
 ## Project structure
 
 ```
-Anemia Detection Code/
-  app.py                  Flask app — loads model.pkl/scaler.pkl and serves predictions
-  train.py                 Reproducible training pipeline (dedup -> CV -> held-out test -> save artifacts)
-  data/anemia.csv           Source dataset
-  model.pkl, scaler.pkl,
-  metrics.json               Committed output of the last `python train.py` run
-  analysis/
-    diagnose_data_issues.py  Reproduces the duplicate-row + threshold + ablation findings
-    FINDINGS.md               Write-up of the diagnosis, with real captured output
-  tests/
-    test_data_quality.py     Regression guards for the two root causes above
-    test_app.py                Flask route tests (health, predict form, /result validation)
-  templates/, static/         Web UI
+app/                        Flask app (factory + blueprint)
+  routes.py                   Web pages + REST API
+  services/prediction_service.py   Shared prediction+validation logic (used by both web and API)
+  templates/, static/         5-page UI
+
+src/
+  data/                       load_data.py, validate_data.py (dedup, physiological-range checks, leakage check)
+  features/                   feature_engineering.py (sklearn ColumnTransformer/Pipeline)
+  models/                     train.py (benchmark+tune+select), evaluate.py, tuning.py
+  explainability/             explain.py (permutation importance + SHAP)
+
+data/
+  raw/                        Source CSV, as downloaded
+  processed/                  Cleaned dataset (generated)
+
+models/                      model.joblib + metadata.json (versioned artifact)
+reports/
+  data_quality/                DATASET_CARD.md, data_quality_report.json
+  metrics/                     latest_metrics.json, experiments.json (lightweight experiment log)
+  figures/                     global_feature_importance.json, drift_report.json
+
+scripts/drift_report.py      Offline drift-monitoring demonstration
+tests/                        26 pytest tests: data validation, features, models, app, API
+analysis/                     HISTORICAL — the original leakage diagnosis (see above)
 ```
 
 ## Running it locally
@@ -66,18 +101,47 @@ Anemia Detection Code/
 Requires Python 3.11+.
 
 ```bash
-cd "Anemia Detection Code"
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 
-python train.py          # trains and saves model.pkl / scaler.pkl / metrics.json
-python -m pytest tests/  # 11 tests: data-quality regression guards + Flask routes
+python -m src.data.validate_data     # cleans data/raw -> data/processed, writes the data-quality report
+python -m src.models.train           # benchmark -> tune -> held-out eval -> models/model.joblib
+python -m src.explainability.explain # global feature importance report
+python -m scripts.drift_report       # offline drift-monitoring demo
 
-python app.py             # http://localhost:5000 (set FLASK_DEBUG=true for the interactive debugger)
+python -m pytest tests/ -v           # 26 tests
+ruff check .                         # lint
+
+python wsgi.py                       # http://localhost:5000 (set FLASK_DEBUG=true for the interactive debugger)
 ```
 
-`model.pkl`/`scaler.pkl`/`metrics.json` are committed, so `python app.py` works right after `pip install` without retraining — `train.py` is there for reproducibility and for anyone who wants to change the feature set or model list.
+`models/model.joblib`, `metadata.json`, and everything in `reports/` are committed, so the app runs immediately after `pip install` without retraining. Re-run the pipeline yourself to verify every number in this README.
+
+## API usage example
+
+```bash
+curl -X POST http://localhost:5000/api/v1/predict \
+  -H "Content-Type: application/json" \
+  -d '{"WBC":7.5,"LYMp":35,"NEUTp":55,"LYMn":2.5,"NEUTn":4.0,"RBC":5.0,"HGB":14.5,"HCT":43,"MCV":88,"MCH":29,"MCHC":33,"PLT":280,"PDW":15,"PCT":0.2}'
+```
+
+Returns prediction, confidence, full class probabilities, and the top contributing features.
+
+## Testing
+
+26 pytest tests across `tests/`: data-quality regression guards (duplicate detection, physiological-range validation, the single-feature leakage check), feature-engineering pipeline shape/scaling, evaluation metrics, the committed model artifact (loads, predicts, probabilities sum to 1), and the full Flask app + REST API (all pages, valid/invalid input, no PII fields). CI (`.github/workflows/tests.yml`) lints, re-validates the data, retrains from scratch, regenerates explainability, and runs the suite on every push.
+
+## Limitations
+
+- **Two classes have very few examples** (Macrocytic anemia: 16, Leukemia with thrombocytopenia: 10) — their per-class precision/recall carry wide uncertainty; read the confusion matrix's rows/columns for those classes accordingly.
+- **Manually diagnosed, single-source data.** The dataset's own description states diagnoses were made manually from CBC values; this hasn't been cross-validated against a second, independent clinical dataset.
+- **Physiologically-implausible-row filtering uses fixed reference ranges** (see `src/data/validate_data.py`) — generous enough to keep genuine extreme pathology, but a judgment call, not a formally validated clinical threshold set.
+- **Not a diagnostic tool.** This reproduces patterns in a labeled dataset; it has not been through clinical validation and does not replace a clinician.
+
+## Ethical & medical disclaimer
+
+This application is an educational machine learning project and is not a medical diagnostic tool or a substitute for professional healthcare advice.
 
 ## Tech stack
 
-Python, scikit-learn, pandas, Flask, pytest, GitHub Actions.
+Python, scikit-learn, SHAP, pandas, Flask, pytest, ruff, GitHub Actions.
