@@ -57,7 +57,11 @@ def performance():
     importance = _read_json(GLOBAL_IMPORTANCE_PATH)
     experiments = _read_json(REPO_ROOT / "reports" / "metrics" / "experiments.json") or []
     cv_results_sorted = (
-        sorted(metrics["cross_validation_benchmark"].items(), key=lambda kv: kv[1]["macro_f1_mean"], reverse=True)
+        sorted(
+            metrics["cross_validation_benchmark"].items(),
+            key=lambda kv: kv[1]["macro_f1_mean"],
+            reverse=True,
+        )
         if metrics else []
     )
     return render_template(

@@ -1,6 +1,6 @@
 {
   "model_name": "Gradient Boosting",
-  "trained_at": "2026-08-23T15:00:52.201292+00:00",
+  "trained_at": "2026-08-23T15:18:52.140266+00:00",
   "feature_columns": [
     "WBC",
     "LYMp",

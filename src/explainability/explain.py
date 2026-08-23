@@ -12,7 +12,6 @@ import json
 from pathlib import Path
 
 import joblib
-import numpy as np
 import pandas as pd
 import shap
 from sklearn.inspection import permutation_importance
@@ -98,9 +97,11 @@ def main() -> None:
     background = X.sample(min(50, len(X)), random_state=RANDOM_STATE)
     explainer = make_shap_explainer(pipeline, background)
     local = explain_prediction(pipeline, example, explainer)
-    print(f"\nExample local explanation for one held-out row (predicted: {pipeline.predict(example)[0]}):")
+    predicted = pipeline.predict(example)[0]
+    print(f"\nExample local explanation for one held-out row (predicted: {predicted}):")
     for item in local:
-        print(f"  {item['feature']}={item['value']}: {item['direction']} likelihood (shap={item['shap_value']:+.4f})")
+        print(f"  {item['feature']}={item['value']}: {item['direction']} likelihood "
+              f"(shap={item['shap_value']:+.4f})")
 
 
 if __name__ == "__main__":

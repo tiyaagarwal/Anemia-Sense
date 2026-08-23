@@ -70,8 +70,9 @@ def clean_and_validate(df_raw: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     report["smallest_class"] = df[TARGET_COLUMN].value_counts().idxmin()
     report["smallest_class_count"] = int(df[TARGET_COLUMN].value_counts().min())
 
-    report["single_feature_leakage_check_depth3_stump_accuracy"] = leakage_check(df)
-    report["max_single_feature_accuracy"] = max(report["single_feature_leakage_check_depth3_stump_accuracy"].values())
+    leakage_scores = leakage_check(df)
+    report["single_feature_leakage_check_depth3_stump_accuracy"] = leakage_scores
+    report["max_single_feature_accuracy"] = max(leakage_scores.values())
     report["leakage_finding"] = (
         "No single feature reconstructs the label (max single-feature stump accuracy "
         f"{report['max_single_feature_accuracy']:.1%}) — see analysis/FINDINGS.md for the "

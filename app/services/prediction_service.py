@@ -11,7 +11,7 @@ import pandas as pd
 from src.data.load_data import FEATURE_COLUMNS, load_processed
 from src.data.validate_data import PHYSIOLOGICAL_RANGES
 from src.explainability.explain import explain_prediction, make_shap_explainer
-from src.models.train import MODEL_PATH, METADATA_PATH, RANDOM_STATE
+from src.models.train import METADATA_PATH, MODEL_PATH, RANDOM_STATE
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 

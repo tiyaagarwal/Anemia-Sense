@@ -60,7 +60,9 @@ def build_candidates() -> dict:
 
 def select_best(cv_results: dict) -> str:
     best_mean = max(r["macro_f1_mean"] for r in cv_results.values())
-    candidates = [name for name, r in cv_results.items() if best_mean - r["macro_f1_mean"] <= CV_TIE_TOLERANCE]
+    candidates = [
+        name for name, r in cv_results.items() if best_mean - r["macro_f1_mean"] <= CV_TIE_TOLERANCE
+    ]
     return min(candidates, key=lambda name: INTERPRETABILITY_RANK.get(name, 99))
 
 
@@ -71,7 +73,8 @@ def main() -> None:
     X_trainval, X_test, y_trainval, y_test = train_test_split(
         X, y, test_size=0.2, stratify=y, random_state=RANDOM_STATE
     )
-    print(f"Train/val: {len(X_trainval)} rows, held-out test: {len(X_test)} rows (never used below until final eval)")
+    print(f"Train/val: {len(X_trainval)} rows, held-out test: {len(X_test)} rows "
+          "(never used below until final eval)")
 
     preprocessor = build_preprocessor()
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
@@ -88,7 +91,8 @@ def main() -> None:
             "accuracy_mean": float(acc_scores.mean()),
             "accuracy_std": float(acc_scores.std()),
         }
-        print(f"  {name}: macro-F1={f1_scores.mean():.1%} (+/-{f1_scores.std():.1%})  accuracy={acc_scores.mean():.1%}")
+        print(f"  {name}: macro-F1={f1_scores.mean():.1%} (+/-{f1_scores.std():.1%})  "
+              f"accuracy={acc_scores.mean():.1%}")
 
     best_name = select_best(cv_results)
     print(f"\nSelected model: {best_name} (macro-F1={cv_results[best_name]['macro_f1_mean']:.1%}, "
