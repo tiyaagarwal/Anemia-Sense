@@ -98,7 +98,7 @@ analysis/                     HISTORICAL — the original leakage diagnosis (see
 
 ## Running it locally
 
-Requires Python 3.12+ (numpy 2.5 requires it; CI runs on 3.13).
+Requires Python 3.11+ (the pinned deps' floor per PyPI metadata; CI runs on 3.13).
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
